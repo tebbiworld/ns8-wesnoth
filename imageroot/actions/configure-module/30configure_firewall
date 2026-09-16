@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Open the game port on the node firewall as a public service named after
+# the instance (replace_ports: a port change closes the old one).
+
+import json
+import os
+import sys
+
+import agent
+
+data = json.load(sys.stdin)
+module_id = os.environ["MODULE_ID"]
+agent.assert_exp(agent.add_public_service(module_id, [f"{int(data['game_port'])}/tcp"], replace_ports=True))
+open(".public-service", "w").close()  # remembered for destroy-module

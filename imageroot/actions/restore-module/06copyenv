@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Carry the settings of the backed-up instance over to the new one.
+
+import json
+import sys
+
+import agent
+
+request = json.load(sys.stdin)
+env = request["environment"]
+keep = ["GAME_PORT", "ADMIN_PASSWORD", "MOTD", "CONNECTIONS_ALLOWED", "VERSIONS_ACCEPTED", "SAVE_REPLAYS",
+        "DISALLOW_NAMES", "LOG_LEVEL", "WESNOTHD_LOG_ARGS"]
+agent.mset_env({k: env[k] for k in keep if k in env})

@@ -1,0 +1,47 @@
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# wesnothd — the Battle for Wesnoth multiplayer server, built from the
+# official source tag (server only: no game, no SDL, no game data needed).
+# The version is passed as build argument by build-images.sh.
+
+ARG WESNOTH_VERSION=1.18.8
+
+FROM docker.io/library/debian:trixie-slim AS builder
+ARG WESNOTH_VERSION
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates git cmake make g++ pkg-config gettext \
+        libboost-all-dev libssl-dev libcurl4-openssl-dev libbz2-dev zlib1g-dev libicu-dev \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /src
+# git clone instead of the GitHub tarball: the bundled Lua is a submodule
+RUN git clone --depth 1 --branch "${WESNOTH_VERSION}" --recurse-submodules --shallow-submodules https://github.com/wesnoth/wesnoth.git . \
+    && mkdir build && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_GAME=OFF -DENABLE_SERVER=ON -DENABLE_CAMPAIGN_SERVER=OFF \
+                -DENABLE_NLS=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && make -j"$(nproc)" wesnothd \
+    && install -m 0755 wesnothd /usr/local/bin/wesnothd \
+    && /usr/local/bin/wesnothd -V
+
+FROM docker.io/library/debian:trixie-slim
+ARG WESNOTH_VERSION
+LABEL org.opencontainers.image.title="wesnothd" \
+      org.opencontainers.image.description="Battle for Wesnoth multiplayer server ${WESNOTH_VERSION}" \
+      org.opencontainers.image.source="https://github.com/tebbiworld/ns8-wesnoth" \
+      org.opencontainers.image.licenses="GPL-2.0-or-later"
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libboost-filesystem1.83.0 libboost-iostreams1.83.0 libboost-locale1.83.0 libboost-random1.83.0 \
+        libboost-regex1.83.0 libboost-program-options1.83.0 libboost-system1.83.0 libboost-thread1.83.0 \
+        libboost-coroutine1.83.0 libboost-context1.83.0 libboost-chrono1.83.0 libboost-atomic1.83.0 \
+        libssl3t64 libcurl4t64 libbz2-1.0 zlib1g libicu76 \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -g 1000 wesnoth && useradd -u 1000 -g 1000 -d /var/lib/wesnothd -M -s /usr/sbin/nologin wesnoth \
+    && mkdir -p /var/lib/wesnothd /etc/wesnothd && chown wesnoth:wesnoth /var/lib/wesnothd
+COPY --from=builder /usr/local/bin/wesnothd /usr/local/bin/wesnothd
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+ENV WESNOTH_VERSION=${WESNOTH_VERSION}
+USER wesnoth
+WORKDIR /var/lib/wesnothd
+VOLUME /var/lib/wesnothd
+EXPOSE 15000
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

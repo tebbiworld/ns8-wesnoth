@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Send an admin command to the running wesnothd through its FIFO and return
+# the response. wesnothd logs the answer of a command sent as "+<issuer>: <cmd>"
+# between [admin_command_response] markers (log domain "server", level info),
+# so the response is read back from the container log.
+#
+# Usage: wesnothd-cmd <command...>       (e.g. status, games, msg Hello, help)
+
+import datetime
+import subprocess
+import sys
+import time
+
+CONTAINER = "wesnoth"
+FIFO = "/var/lib/wesnothd/socket"
+
+
+def run(command, timeout=8.0):
+    since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=1)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    try:
+        # "+<issuer>: <command>": the '+' form makes wesnothd wrap the answer in
+        # [admin_command_response] markers; a "+" without the colon crashes the
+        # FIFO handler until the server is restarted, so always send an issuer.
+        # refuse to write unless the path is a named pipe: a plain file would
+        # swallow the command and break the FIFO at the next server start
+        subprocess.run(["podman", "exec", CONTAINER, "sh", "-c",
+                        '[ -p "$2" ] || { echo "server FIFO $2 not available (server starting?)" >&2; exit 3; }; printf "%s\\n" "$1" > "$2"',
+                        "sh", "+ns8: " + command, FIFO],
+                       capture_output=True, text=True, timeout=5, check=True)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("the server did not read the command (FIFO not open)")
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError((e.stderr or "").strip() or "podman exec failed (server not running?)")
+    deadline = time.monotonic() + timeout
+    while True:
+        log = subprocess.run(["podman", "logs", "--since", since, CONTAINER], capture_output=True, text=True, timeout=10)
+        text = log.stdout + log.stderr
+        start = text.rfind("[admin_command_response]")
+        end = text.find("[/admin_command_response]", start if start >= 0 else 0)
+        if start >= 0 and end > start:
+            body = text[start + len("[admin_command_response]"):end]
+            return body.strip("\n").strip()
+        if time.monotonic() > deadline:
+            raise RuntimeError("no response from the server within %ds (is the server log level at least 'info'?)" % timeout)
+        time.sleep(0.3)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("usage: wesnothd-cmd <command...>", file=sys.stderr)
+        sys.exit(2)
+    try:
+        print(run(" ".join(sys.argv[1:])))
+    except RuntimeError as e:
+        print(str(e), file=sys.stderr)
+        sys.exit(1)

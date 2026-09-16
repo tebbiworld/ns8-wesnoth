@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "run-command input",
+    "$id": "http://nethserver.org/json-schema/task/input/wesnoth/run-command",
+    "description": "Send an admin command to the running wesnothd through its FIFO",
+    "examples": [{ "command": "msg Server restarts in 5 minutes" }],
+    "type": "object",
+    "required": ["command"],
+    "properties": {
+        "command": { "type": "string", "minLength": 1, "maxLength": 1000 }
+    }
+}

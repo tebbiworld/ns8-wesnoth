@@ -1,0 +1,22 @@
+{
+  "name": "Wesnoth Server",
+  "description": {
+    "en": "Battle for Wesnoth multiplayer server (wesnothd, built from the official source) — permanent lobby for the free turn-based strategy game, admin console, replays, players connect with the Wesnoth client",
+    "de": "Battle-for-Wesnoth-Mehrspieler-Server (wesnothd, aus dem offiziellen Quellcode gebaut) — dauerhafte Lobby für das freie rundenbasierte Strategiespiel, Admin-Konsole, Replays, Spieler verbinden sich mit dem Wesnoth-Client"
+  },
+  "categories": [
+    "multimedia"
+  ],
+  "authors": [
+    {
+      "name": "tebbi",
+      "email": "info@ebbinghaus.world"
+    }
+  ],
+  "docs": {
+    "documentation_url": "https://wiki.wesnoth.org/ServerAdministration",
+    "bug_url": "https://github.com/tebbiworld/ns8-wesnoth/issues",
+    "code_url": "https://github.com/tebbiworld/ns8-wesnoth"
+  },
+  "source": "ghcr.io/tebbiworld/wesnoth"
+}

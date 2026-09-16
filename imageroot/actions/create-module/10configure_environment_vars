@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Seed the environment for a fresh instance; everything is applied by the
+# first configure-module run.
+
+import agent
+
+agent.mset_env({
+    "GAME_PORT": "15000",
+    "ADMIN_PASSWORD": "",
+    "MOTD": "Welcome to this Battle for Wesnoth server on NethServer 8",
+    "CONNECTIONS_ALLOWED": "5",
+    "VERSIONS_ACCEPTED": "",
+    "SAVE_REPLAYS": "false",
+    "DISALLOW_NAMES": "",
+    "LOG_LEVEL": "info",
+    "WESNOTHD_LOG_ARGS": "--log-info=server",
+})

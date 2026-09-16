@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Close the firewall service opened by configure-module (only if it exists:
+# removing an unknown service makes the node action fail).
+
+import json
+import os
+import sys
+
+import agent
+
+json.load(sys.stdin)
+if os.path.exists(".public-service"):
+    agent.remove_public_service(os.environ["MODULE_ID"])

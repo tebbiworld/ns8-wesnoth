@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Run a wesnothd admin command through the server FIFO and return its output
+# (e.g. "status", "games", "msg Server restarts in 5 minutes", "kick <nick>",
+# "ban <mask> <time> <reason>", "help").
+
+import json
+import os
+import subprocess
+import sys
+
+import agent
+
+data = json.load(sys.stdin)
+command = data["command"].strip().lstrip("/+")
+proc = subprocess.run([os.path.expanduser("~/.config/bin/wesnothd-cmd"), command], capture_output=True, text=True, timeout=30)
+if proc.returncode != 0:
+    print(agent.SD_ERR + (proc.stderr.strip() or "command failed"), file=sys.stderr)
+    sys.exit(1)
+json.dump({"output": proc.stdout.strip()}, fp=sys.stdout)

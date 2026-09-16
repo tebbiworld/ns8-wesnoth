@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Re-run configure-module with the restored settings: config file, firewall
+# service on the (possibly different) node, start the server on the restored
+# wesnoth-data volume.
+
+import os
+
+import agent
+import agent.tasks
+
+env = os.environ
+data = {
+    "game_port": int(env.get("GAME_PORT", "15000")),
+    "admin_password": "",  # kept from ADMIN_PASSWORD
+    "motd": env.get("MOTD", ""),
+    "connections_allowed": int(env.get("CONNECTIONS_ALLOWED", "5")),
+    "versions_accepted": env.get("VERSIONS_ACCEPTED", ""),
+    "save_replays": env.get("SAVE_REPLAYS") == "true",
+    "disallow_names": [x for x in env.get("DISALLOW_NAMES", "").split(",") if x],
+    "log_level": env.get("LOG_LEVEL", "info"),
+}
+response = agent.tasks.run(agent_id=env["AGENT_ID"], action="configure-module", data=data)
+agent.assert_exp(response["exit_code"] == 0, "The configure-module subtask failed!")

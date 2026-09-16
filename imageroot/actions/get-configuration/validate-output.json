@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "get-configuration output",
+    "$id": "http://schema.nethserver.org/wesnoth/get-configuration-output.json",
+    "description": "Get Wesnoth server configuration",
+    "type": "object",
+    "properties": {
+        "game_port": { "type": "integer" },
+        "admin_password_set": { "type": "boolean" },
+        "motd": { "type": "string" },
+        "connections_allowed": { "type": "integer" },
+        "versions_accepted": { "type": "string" },
+        "save_replays": { "type": "boolean" },
+        "disallow_names": { "type": "array", "items": { "type": "string" } },
+        "log_level": { "type": "string" },
+        "server_running": { "type": "boolean" },
+        "server_online": { "type": "boolean" },
+        "server_version": { "type": "string" },
+        "players_online": { "type": ["integer", "null"] },
+        "node_ip": { "type": "string" }
+    }
+}

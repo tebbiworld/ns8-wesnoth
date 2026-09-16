@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Return the stored settings plus live server state: container running,
+# wesnothd version, port answering, connected players from the server's own
+# "status" admin command, and a connection hint (node IP:port).
+
+import json
+import os
+import re
+import socket
+import subprocess
+import sys
+
+env = os.environ
+game_port = int(env.get("GAME_PORT", "15000"))
+
+running = False
+version = ""
+online = False
+players = None
+try:
+    st = subprocess.run(["podman", "inspect", "wesnoth", "--format", "{{.State.Status}}"],
+                        capture_output=True, text=True, timeout=10).stdout.strip()
+    running = st == "running"
+except Exception:
+    pass
+if running:
+    try:
+        out = subprocess.run(["podman", "exec", "wesnoth", "wesnothd", "-V"], capture_output=True, text=True, timeout=10).stdout
+        m = re.search(r"(\d+\.\d+\.\d+\S*)", out)
+        version = m.group(1) if m else out.strip()
+    except Exception:
+        pass
+    try:
+        with socket.create_connection(("127.0.0.1", game_port), timeout=3):
+            online = True
+    except OSError:
+        pass
+    if online:
+        try:
+            proc = subprocess.run([os.path.expanduser("~/.config/bin/wesnothd-cmd"), "status"],
+                                  capture_output=True, text=True, timeout=15)
+            if proc.returncode == 0:
+                # one line per connected player: 'nick' @ <ip> logged on for ...
+                players = len([l for l in proc.stdout.splitlines() if re.match(r"^'.*' @ \S+ logged on for", l)])
+        except Exception:
+            pass
+
+node_ip = ""
+try:
+    out = subprocess.run(["ip", "-4", "route", "get", "1.1.1.1"], capture_output=True, text=True, timeout=5).stdout
+    m = re.search(r"\bsrc (\S+)", out)
+    node_ip = m.group(1) if m else ""
+except Exception:
+    pass
+
+config = {
+    "game_port": game_port,
+    "admin_password_set": bool(env.get("ADMIN_PASSWORD", "")),
+    "motd": env.get("MOTD", ""),
+    "connections_allowed": int(env.get("CONNECTIONS_ALLOWED", "5")),
+    "versions_accepted": env.get("VERSIONS_ACCEPTED", ""),
+    "save_replays": env.get("SAVE_REPLAYS") == "true",
+    "disallow_names": [x for x in env.get("DISALLOW_NAMES", "").split(",") if x],
+    "log_level": env.get("LOG_LEVEL", "info"),
+    "server_running": running,
+    "server_online": online,
+    "server_version": version,
+    "players_online": players,
+    "node_ip": node_ip,
+}
+json.dump(config, fp=sys.stdout)

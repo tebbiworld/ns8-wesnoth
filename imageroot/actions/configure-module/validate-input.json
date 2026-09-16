@@ -1,0 +1,68 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Configure wesnoth",
+    "$id": "http://nethserver.org/json-schema/task/input/wesnoth/configure-module",
+    "description": "Configure the Battle for Wesnoth server module",
+    "examples": [
+        {
+            "game_port": 15000,
+            "admin_password": "secret",
+            "motd": "Welcome to our Wesnoth server",
+            "connections_allowed": 5,
+            "versions_accepted": "",
+            "save_replays": false,
+            "disallow_names": ["*admin*", "*server*"],
+            "log_level": "info"
+        }
+    ],
+    "type": "object",
+    "required": ["game_port"],
+    "properties": {
+        "game_port": {
+            "type": "integer",
+            "title": "Game port",
+            "description": "TCP port published on the node for the Wesnoth clients (default 15000).",
+            "minimum": 1024,
+            "maximum": 65535
+        },
+        "admin_password": {
+            "type": "string",
+            "title": "Administrator password",
+            "description": "Password for /query admin commands from a client. Empty: keep the current one.",
+            "format": "password",
+            "maxLength": 200
+        },
+        "admin_password_clear": {
+            "type": "boolean",
+            "title": "Remove the administrator password",
+            "description": "Disables admin login from clients (the console on the settings page still works)."
+        },
+        "motd": { "type": "string", "title": "Message of the day", "maxLength": 1000 },
+        "connections_allowed": {
+            "type": "integer",
+            "title": "Connections per IP address",
+            "description": "0 = unlimited (wesnothd default 5).",
+            "minimum": 0,
+            "maximum": 1000
+        },
+        "versions_accepted": {
+            "type": "string",
+            "title": "Accepted client versions",
+            "description": "Comma separated patterns (* and ? wildcards), e.g. 1.18.*. Empty: every version of the server's stable series.",
+            "pattern": "^[0-9A-Za-z_.*?+, -]*$",
+            "maxLength": 200
+        },
+        "save_replays": { "type": "boolean", "title": "Save replays of finished games" },
+        "disallow_names": {
+            "type": "array",
+            "title": "Disallowed nicknames",
+            "description": "Patterns with * and ? wildcards; empty list = wesnothd defaults.",
+            "items": { "type": "string", "pattern": "^[^\"\\s,]+$", "maxLength": 64 }
+        },
+        "log_level": {
+            "type": "string",
+            "title": "Server log detail",
+            "enum": ["warning", "info", "debug"]
+        }
+    }
+}
