@@ -17,7 +17,7 @@ Wesnoth Server is a community application from the [[ns8:tebbiworld_repository|t
 =====Architecture=====
 
 ^ Container ^ Image ^ Purpose ^
-| ''wesnoth'' | ''ghcr.io/tebbiworld/wesnoth-server:<module version>'' (built from the pinned Wesnoth tag) | ''wesnothd'' as uid 1000, port 15000 inside, published on the configured node port |
+| ''wesnoth'' | ''%%ghcr.io/tebbiworld/wesnoth-server:<module version>%%'' (built from the pinned Wesnoth tag) | ''wesnothd'' as uid 1000, port 15000 inside, published on the configured node port |
 
 ^ Volume ^ Purpose ^ Backup ^
 | ''wesnoth-data'' | replays, ban list, command FIFO | yes |
@@ -54,7 +54,7 @@ api-cli run module/wesnoth1/run-command --data '{"command":"status"}'
 runagent -m wesnoth1 wesnothd-cmd games
 </code>
 
-Useful commands: ''status'', ''games'', ''metrics'', ''msg <text>'', ''kick <nick> [reason]'', ''ban <mask> <time> [reason]'' (times ''short'' = 1 h, ''day'', ''week'', ''month'' or e.g. ''2D12h''), ''unban <mask>'', ''bans'', ''motd <text>'', ''help''.
+Useful commands: ''status'', ''games'', ''metrics'', ''%%msg <text>%%'', ''%%kick <nick> [reason]%%'', ''%%ban <mask> <time> [reason]%%'' (times ''short'' = 1 h, ''day'', ''week'', ''month'' or e.g. ''2D12h''), ''%%unban <mask>%%'', ''bans'', ''%%motd <text>%%'', ''help''.
 
 =====Backup and restore=====
 The NS8 backup includes the settings, the generated ''wesnothd.cfg'' and the ''wesnoth-data'' volume. A restore recreates the instance, opens the port on the target node and starts the server.
