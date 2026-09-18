@@ -77,4 +77,9 @@ The module pins a Wesnoth source tag. A weekly GitHub Action lists the tags of t
 =====Disclaimer=====
 Community-maintained module without warranty; use at your own risk. Open an issue on GitHub for bugs and questions.
 
+{{tag>application}}
+{{tag>category:MultiMedia}}
+{{tag>status:Alpha}}
+{{tag>certlevel:1}}
+{{tag>repo:tebbiworld}}
 {{tag>description:"Battle for Wesnoth multiplayer server (wesnothd) with admin console, replays and automatic updates"}}
