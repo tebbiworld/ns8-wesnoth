@@ -11,9 +11,17 @@ import json
 import sys
 
 import agent
+import modsecrets
 
 request = json.load(sys.stdin)
 env = request["environment"]
-keep = ["GAME_PORT", "ADMIN_PASSWORD", "MOTD", "CONNECTIONS_ALLOWED", "VERSIONS_ACCEPTED", "SAVE_REPLAYS",
+keep = ["GAME_PORT", "MOTD", "CONNECTIONS_ALLOWED", "VERSIONS_ACCEPTED", "SAVE_REPLAYS",
         "DISALLOW_NAMES", "LOG_LEVEL", "WESNOTHD_LOG_ARGS"]
 agent.mset_env({k: env[k] for k in keep if k in env})
+
+# The admin password comes back with the restored state/passwords.env. A backup
+# taken with module version 1.0.0 still carries it in the environment.
+if env.get("ADMIN_PASSWORD"):
+    modsecrets.write({"ADMIN_PASSWORD": env["ADMIN_PASSWORD"]})
+    print("restored the legacy admin password from the backup environment into passwords.env", file=sys.stderr)
+modsecrets.ensure({})
