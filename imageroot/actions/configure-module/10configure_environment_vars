@@ -17,6 +17,7 @@ import subprocess
 import sys
 
 import agent
+import modsecrets
 
 data = json.load(sys.stdin)
 env = os.environ
@@ -46,7 +47,7 @@ password = (data.get("admin_password") or "").strip()
 if data.get("admin_password_clear"):
     password = ""
 elif not password:
-    password = env.get("ADMIN_PASSWORD", "")
+    password = modsecrets.get("ADMIN_PASSWORD")
 motd = (data.get("motd") or "").strip()
 connections = int(data.get("connections_allowed") if data.get("connections_allowed") is not None else 5)
 versions = ",".join(v.strip() for v in (data.get("versions_accepted") or "").split(",") if v.strip())
@@ -55,9 +56,11 @@ names = [n.strip() for n in (data.get("disallow_names") or []) if n.strip()]
 log_level = data.get("log_level") or "info"
 log_args = {"warning": "--log-warning=server", "info": "--log-info=server", "debug": "--log-debug=server"}[log_level]
 
+# The admin password is a secret: state/passwords.env, not the module environment.
+modsecrets.write({"ADMIN_PASSWORD": password})
+
 agent.mset_env({
     "GAME_PORT": str(game_port),
-    "ADMIN_PASSWORD": password,
     "MOTD": motd,
     "CONNECTIONS_ALLOWED": str(connections),
     "VERSIONS_ACCEPTED": versions,
