@@ -12,7 +12,6 @@ import agent
 
 agent.mset_env({
     "GAME_PORT": "15000",
-    "ADMIN_PASSWORD": "",
     "MOTD": "Welcome to this Battle for Wesnoth server on NethServer 8",
     "CONNECTIONS_ALLOWED": "5",
     "VERSIONS_ACCEPTED": "",

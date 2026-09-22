@@ -16,6 +16,8 @@ import socket
 import subprocess
 import sys
 
+import modsecrets  # noqa: E402
+
 env = os.environ
 game_port = int(env.get("GAME_PORT", "15000"))
 
@@ -61,7 +63,7 @@ except Exception:
 
 config = {
     "game_port": game_port,
-    "admin_password_set": bool(env.get("ADMIN_PASSWORD", "")),
+    "admin_password_set": bool(modsecrets.get("ADMIN_PASSWORD")),
     "motd": env.get("MOTD", ""),
     "connections_allowed": int(env.get("CONNECTIONS_ALLOWED", "5")),
     "versions_accepted": env.get("VERSIONS_ACCEPTED", ""),

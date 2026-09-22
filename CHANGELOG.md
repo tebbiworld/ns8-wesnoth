@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.0 — 2026-09-19
+
+Alignment with the NethServer module conventions (NethServer/agents skills).
+
+### Changed
+
+- **Secrets moved out of the module environment.** The server admin password is now kept in `state/passwords.env` (mode 0600) instead of `state/environment`, which NS8 mirrors to Redis in plain text. Existing installations are migrated on update; the value does not change.
+- The module backup includes `state/passwords.env`; restore reads the password from it (backups taken with 1.0.0 are still restorable).
+- `update-module` only restarts a running instance.
+
+### Added
+
+- Robot Framework tests (install, update from the previous release, backup and restore) run on real NS8 nodes through `stephdl/ns8-ci-actions`.
+
 ## 1.0.0 — 2026-09-16
 
 - Initial release: `wesnothd` (Battle for Wesnoth 1.18.8) built server-only

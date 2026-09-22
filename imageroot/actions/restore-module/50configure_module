@@ -17,7 +17,7 @@ import agent.tasks
 env = os.environ
 data = {
     "game_port": int(env.get("GAME_PORT", "15000")),
-    "admin_password": "",  # kept from ADMIN_PASSWORD
+    "admin_password": "",  # blank = keep the restored value from passwords.env
     "motd": env.get("MOTD", ""),
     "connections_allowed": int(env.get("CONNECTIONS_ALLOWED", "5")),
     "versions_accepted": env.get("VERSIONS_ACCEPTED", ""),
