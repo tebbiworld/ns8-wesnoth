@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.1.2 — unreleased
+
+Platform integration. These changes were reviewed in PR #2 but merged into a
+side branch instead of `main`, so 1.1.0 and 1.1.1 shipped without them.
+
+### Added
+
+- **Clone and move.** New `clone-module` step (a link to the restore step): a cloned or moved instance gets its route and settings back instead of coming up unconfigured. The settings are read from the source instance, including those a new instance starts with a default for.
+- Release notes are linked from the software centre (`relnotes_url`).
+
+## 1.1.1 — 2026-09-23
+
+Maintenance release without changes to the module: the registry clean-up
+workflow now uses the token that actually exists. No update needed.
+
 ## 1.1.0 — 2026-09-19
 
 Alignment with the NethServer module conventions (NethServer/agents skills).
