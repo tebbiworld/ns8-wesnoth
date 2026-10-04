@@ -16,7 +16,8 @@
   "docs": {
     "documentation_url": "https://wiki.wesnoth.org/ServerAdministration",
     "bug_url": "https://github.com/tebbiworld/ns8-wesnoth/issues",
-    "code_url": "https://github.com/tebbiworld/ns8-wesnoth"
+    "code_url": "https://github.com/tebbiworld/ns8-wesnoth",
+    "relnotes_url": "https://github.com/tebbiworld/ns8-wesnoth/releases"
   },
   "source": "ghcr.io/tebbiworld/wesnoth"
 }
